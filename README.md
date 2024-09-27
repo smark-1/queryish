@@ -175,3 +175,39 @@ class CountryQuerySet(Queryish):
 ```
 
 Subclasses will also typically override the method `run_count`, which returns the number of records in the queryset accounting for any filtering and slicing. If this is not overridden, the default implementation will call `run_query` and count the results.
+
+## Wagtail
+
+_queryish_ includes a [Custom ViewSet](https://docs.wagtail.org/en/stable/reference/viewsets.html#viewset) for wagtail. This view includes an inspect view enabled by default and a list view. (queryish.wagtail_modelview.QueryishModelViewSet)
+
+In addition to all the [Wagtail ViewSet](https://docs.wagtail.org/en/stable/reference/viewsets.html#viewset) options the following options are available.
+
+* model - Queryish APIModel (required)
+* name - Default url prefix and namespace (required)
+* menu_label - Label in wagtail menu (required)
+* list_display - fields to display in the list view
+* inspect_view_fields - fields to show in inspect view (default all model fields)
+* inspect_view_fields_exclude - fields to exclude from the inspect view
+
+Example:
+
+```python
+from queryish.wagtail_modelview import QueryishModelViewSet
+
+class PartyModelViewSet(QueryishModelViewSet):
+    model = Party
+    icon = "table"
+    inspect_view_enabled = True
+    add_to_admin_menu = True
+    name='Party'
+    menu_label='Party'
+
+    list_display = ["id", "name", "start_date", "end_date", "location", "country_code"]
+
+    inspect_view_fields_exclude = ["id"]
+
+@hooks.register("register_admin_viewset")
+def register_viewset():
+    return PartyModelViewSet()
+
+```
